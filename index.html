@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-  <title>Sara vs Mike v7</title>
+  <title>Sara vs Mike v8</title>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; user-select:none; }
@@ -124,12 +124,12 @@
     .hex-btn.cd, .bless-btn.cd { pointer-events:none; }
     .ring {
       position:absolute; inset:3px; border-radius:50%; pointer-events:none; opacity:0; z-index:2;
-      background:conic-gradient(#f5a524 var(--p,0%), #ffffff20 0);
+      background:conic-gradient(#f5a524 var(--p,0%), transparent 0);
       -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));
               mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));
     }
     .hex-btn.cd .ring, .bless-btn.cd .ring { opacity:1; }
-    .bless-btn .ring { background:conic-gradient(#6ad7ff var(--p,0%), #ffffff18 0); }
+    .bless-btn .ring { background:conic-gradient(#6ad7ff var(--p,0%), transparent 0); }
 
     .end { position:absolute; inset:0; display:none; place-items:center; background:#07080ccc; z-index:20; backdrop-filter:blur(8px); }
     .end.show { display:grid; }
