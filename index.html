@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Sara vs Mike</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; user-select:none; }
+    html, body { height:100%; background:#07080c; color:#e8ecf4; font-family:Manrope,system-ui,sans-serif; overflow:hidden; }
+    button { border:0; background:none; font:inherit; color:inherit; }
+    body.desk { display:grid; place-items:center; }
+    .phone {
+      position:relative; width:100%; height:100%; overflow:hidden;
+      background:#07080c center/cover no-repeat url("assets/arena.jpg");
+    }
+    body.desk .phone {
+      width:390px; height:min(844px,100dvh); border-radius:40px;
+      box-shadow:0 30px 80px #000c;
+    }
+    .wash { position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity .25s; }
+    .phone.hexing .wash { opacity:1; background:radial-gradient(circle at 72% 78%, #ff701866, transparent 46%); }
+    .phone.warding .wash { opacity:1; background:radial-gradient(circle at 72% 78%, #2ad0ff44, transparent 46%); }
+    .phone.enemy .wash { opacity:1; background:radial-gradient(circle at 30% 28%, #7a40ff55, transparent 48%); }
+    .phone.crit .wash { opacity:.5; background:radial-gradient(circle at 70% 70%, #ff285022, transparent 50%); }
+    .shake { animation:shake .28s both; }
+    @keyframes shake { 25%{transform:translate(-4px,2px)} 50%{transform:translate(5px,-2px)} 75%{transform:translate(-3px,1px)} }
+
+    .hud {
+      position:absolute; left:14px; right:14px; top:calc(env(safe-area-inset-top,0px) + 16px);
+      display:grid; grid-template-columns:1fr auto 1fr; align-items:center; z-index:8;
+    }
+    body.desk .hud { top:28px; }
+    .pill { display:inline-flex; align-items:center; gap:6px; height:28px; padding:0 10px 0 7px; border-radius:12px; font-size:14px; font-weight:800; }
+    .coin { justify-self:start; color:#f3d38a; background:#ef931933; border:1px solid #fbb42299; }
+    .eye { justify-self:end; color:#d5dced; background:#bfcfff1a; border:1px solid #87a0d44d; position:relative; }
+    .gem { width:16px; height:16px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#ffe7a0,#e08914); }
+    .eye-ic { width:16px; height:11px; border:1.7px solid #c9d0e4; border-radius:50%; position:relative; }
+    .eye-ic:after { content:""; position:absolute; inset:2px 4px; background:#9aa8e8; border-radius:50%; }
+    .clock { width:58px; height:58px; display:grid; place-items:center; position:relative; }
+    .clock svg { position:absolute; inset:0; }
+    .clock span { font-size:12px; font-weight:800; }
+    .clock.warn span { color:#e0a15a; }
+    .reacts { position:absolute; right:4px; top:30px; width:22px; pointer-events:none; }
+    .react { position:absolute; animation:up 1.1s ease-out forwards; font-size:13px; }
+    @keyframes up { from{opacity:0;transform:translateY(8px)} 20%{opacity:1} to{opacity:0;transform:translateY(-46px)} }
+
+    .mike-hud { position:absolute; left:18px; top:16%; z-index:5; width:58%; }
+    .sara-hud { position:absolute; left:38%; bottom:38%; z-index:5; width:58%; }
+    .lab { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+    .sara-hud .lab { padding-left:8px; }
+    .nm { font-size:12px; font-weight:800; letter-spacing:.06em; color:#d8deea; }
+    .pip { width:7px; height:7px; border-radius:50%; }
+    .pip.m { background:#6a78ff; box-shadow:0 0 8px #6a78ff88; }
+    .pip.s { background:#f0a24a; box-shadow:0 0 8px #f0a24a88; }
+    .wrap { display:flex; align-items:center; gap:8px; }
+    .bar { position:relative; flex:1; height:18px; border-radius:10px; background:#10141c; box-shadow:0 3px 8px #0007; }
+    .bar:after { content:""; position:absolute; inset:0; border-radius:10px; border:2px solid #26754a; pointer-events:none; }
+    .bar.mid:after { border-color:#c4770b; }
+    .bar.low:after { border-color:#b739ad; }
+    .ghost, .fill { position:absolute; top:1px; bottom:1px; left:1px; border-radius:9px; }
+    .ghost { background:#fff2; transition:width .7s ease; }
+    .fill { transition:width .28s cubic-bezier(.2,.8,.2,1), background .25s; }
+    .fill.hi { background:linear-gradient(90deg,#d7eca3,#33dcaa); }
+    .fill.md { background:linear-gradient(90deg,#fdbd89,#f8ba28); }
+    .fill.lo { background:linear-gradient(90deg,#ff81bc,#f88d8e); }
+    .shine { position:absolute; top:4px; width:16px; height:7px; border-radius:6px; background:#fff8; opacity:.5; pointer-events:none; }
+    .lv { flex:0 0 auto; font-size:12px; font-weight:800; color:#dadde6; background:#bfcfff1a; border:1px solid #87a0d44d; border-radius:10px; padding:4px 8px; }
+
+    .fig { position:absolute; pointer-events:none; z-index:3; }
+    .fig img { display:block; height:100%; width:auto; object-fit:contain; filter:drop-shadow(0 16px 18px #0009); }
+    .mike { left:2%; top:20%; height:28%; }
+    .mike.atk { left:0; top:17%; height:32%; }
+    .sara { right:0; bottom:11%; height:32%; }
+    .sara.atk { right:-2%; bottom:9%; height:38%; }
+    .idle-m { animation:bob 3.6s ease-in-out infinite; }
+    .idle-s { animation:bob2 3.2s ease-in-out infinite; }
+    @keyframes bob { 50%{ transform:translateY(-5px) } }
+    @keyframes bob2 { 50%{ transform:translateY(-4px) } }
+
+    .fx { position:absolute; inset:0; pointer-events:none; z-index:4; }
+    .rock {
+      position:absolute; width:26px; height:26px; margin:-13px; border-radius:42% 55% 40% 50%;
+      background:radial-gradient(circle at 30% 30%,#ffd08a,#ff4a10 52%,#2a1208);
+      box-shadow:0 0 16px #ff6a20; left:68%; top:68%;
+      animation:flyUp .5s cubic-bezier(.2,.75,.2,1) forwards;
+    }
+    .rock.s { width:14px; height:14px; }
+    .bolt {
+      position:absolute; width:16px; height:16px; margin:-8px; border-radius:40%;
+      background:radial-gradient(circle at 30% 30%,#fff,#7ad0ff 45%,#3a4cff);
+      box-shadow:0 0 16px #4aa8ff; left:32%; top:28%;
+      animation:flyDn .48s cubic-bezier(.2,.75,.2,1) forwards;
+    }
+    @keyframes flyUp { to{ left:24%; top:28%; opacity:.15; transform:scale(.55) rotate(-28deg) } }
+    @keyframes flyDn { to{ left:70%; top:68%; opacity:.15; transform:scale(.6) } }
+    .flash { position:absolute; width:80px; height:80px; margin:-40px; border-radius:50%; }
+    .flash.m { left:26%; top:30%; background:radial-gradient(circle,#fff7,#ff6a2044 42%,transparent 70%); animation:pop .32s ease-out forwards; }
+    .flash.s { left:72%; top:68%; background:radial-gradient(circle,#fff7,#ff6a2044 42%,transparent 70%); animation:pop .32s ease-out forwards; }
+    .flash.w { left:70%; top:66%; background:radial-gradient(circle,#9cf4ff88,#2ad0ff33 45%,transparent 70%); animation:pop .4s ease-out forwards; }
+    @keyframes pop { from{transform:scale(.4);opacity:1} to{transform:scale(1.7);opacity:0} }
+
+    .dock { position:absolute; left:0; right:0; bottom:calc(env(safe-area-inset-bottom,0px) + 18px); height:210px; z-index:7; pointer-events:none; }
+    .act { position:absolute; pointer-events:auto; cursor:pointer; touch-action:manipulation; }
+    .act img { width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 10px 16px #000a); transition:transform .14s ease, filter .2s, opacity .2s; }
+    .bless-btn { left:10%; bottom:86px; width:92px; height:92px; }
+    .hex-btn { left:29%; bottom:6px; width:132px; height:132px; }
+    .act:active img { transform:scale(.92); }
+    .hex-btn.press img { transform:scale(1.16); filter:drop-shadow(0 14px 24px #ff7a2088) brightness(1.12); }
+    .bless-btn.press img { transform:scale(1.12); filter:drop-shadow(0 12px 20px #3cf0ff66) brightness(1.08); }
+    .act.dim { opacity:.55; }
+    .hex-btn.cd img { filter:grayscale(1) brightness(.72); }
+    .hex-btn.cd, .bless-btn.cd { pointer-events:none; }
+    .ring {
+      position:absolute; inset:-4px; border-radius:50%; pointer-events:none; opacity:0;
+      background:conic-gradient(#f5a524 var(--p,0%), #ffffff18 0);
+      -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 calc(100% - 5px));
+              mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 calc(100% - 5px));
+    }
+    .hex-btn.cd .ring, .bless-btn.cd .ring { opacity:1; }
+    .bless-btn .ring { background:conic-gradient(#6ad7ff var(--p,0%), #ffffff18 0); }
+
+    .end { position:absolute; inset:0; display:none; place-items:center; background:#07080ccc; z-index:20; backdrop-filter:blur(8px); }
+    .end.show { display:grid; }
+    .card { width:min(250px,82%); text-align:center; padding:22px 18px; background:#141822ee; border:1px solid #ffffff14; border-radius:18px; }
+    .card h2 { margin-bottom:12px; }
+    .card button { width:100%; padding:11px; border-radius:12px; background:#e8e0d0; color:#121214; font-weight:800; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <div class="phone" id="phone">
+    <div class="wash"></div>
+    <header class="hud">
+      <div class="pill coin"><span class="gem"></span>120</div>
+      <div class="clock" id="clock">
+        <svg viewBox="0 0 58 58">
+          <circle cx="29" cy="29" r="26" fill="#d9d9d91a"/>
+          <circle id="arc" cx="29" cy="29" r="26" fill="none" stroke="#d08927" stroke-width="3.4" stroke-linecap="round" transform="rotate(-90 29 29)" stroke-dasharray="163.4" stroke-dashoffset="0"/>
+        </svg>
+        <span id="timer">1:30</span>
+      </div>
+      <div class="pill eye"><span class="eye-ic"></span><span id="specs">1.543</span><div class="reacts" id="reacts"></div></div>
+    </header>
+
+    <div class="mike-hud">
+      <div class="lab"><span class="pip m"></span><span class="nm">MIKE</span></div>
+      <div class="wrap">
+        <div class="bar" id="mikeBar"><div class="ghost" id="mikeGhost"></div><div class="fill hi" id="mikeFill"></div><div class="shine" id="mikeShine"></div></div>
+        <div class="lv">Lv. 9</div>
+      </div>
+    </div>
+
+    <div class="fig mike" id="mikeFig"><img id="mikeImg" class="idle-m" src="assets/mike-idle.png" alt=""></div>
+    <div class="fig sara" id="saraFig"><img id="saraImg" class="idle-s" src="assets/sara-idle.png" alt=""></div>
+    <div class="fx" id="fx"></div>
+
+    <div class="sara-hud">
+      <div class="lab"><span class="pip s"></span><span class="nm">SARA</span></div>
+      <div class="wrap">
+        <div class="bar" id="saraBar"><div class="ghost" id="saraGhost"></div><div class="fill hi" id="saraFill"></div><div class="shine" id="saraShine"></div></div>
+        <div class="lv">Lv. 9</div>
+      </div>
+    </div>
+
+    <div class="dock">
+      <button class="act bless-btn" id="btnBless" type="button" aria-label="BLESS">
+        <span class="ring" id="blessRing"></span>
+        <img src="assets/bless.png" alt="">
+      </button>
+      <button class="act hex-btn" id="btnHex" type="button" aria-label="HEX">
+        <span class="ring" id="hexRing"></span>
+        <img src="assets/Hex.png" alt="">
+      </button>
+    </div>
+
+    <div class="end" id="end"><div class="card"><h2 id="endTitle">Victory</h2><button id="again" type="button">AGAIN</button></div></div>
+  </div>
+<script>
+const HEX_DMG=22, MIKE_DMG=16, HEX_MAX=2, HEX_CD=3000, BLESS_MS=2200, BLESS_CD=2600, MATCH=90;
+const S={run:false,s:100,m:100,hex:2,blessOn:false,hexBusy:false,hexCd:false,blessCd:false,t:MATCH,specs:1543,lastAtk:1.8};
+const el=id=>document.getElementById(id);
+const CIRC=2*Math.PI*26;
+const vibe=p=>{ try{ navigator.vibrate&&navigator.vibrate(p);}catch(e){} };
+const fmt=n=>n.toLocaleString("de-DE");
+function tone(v){ return v>60?"hi":v>30?"md":"lo"; }
+function barClass(v){ return v>60?"":v>30?" mid":" low"; }
+function paintBar(who,v){
+  const fill=el(who+"Fill"), bar=el(who+"Bar"), shine=el(who+"Shine");
+  fill.style.width=Math.max(0,v)+"%";
+  fill.className="fill "+tone(v);
+  bar.className="bar"+barClass(v);
+  shine.style.left="calc("+Math.max(6,Math.min(80,v-12))+"%)";
+}
+function paint(){
+  paintBar("sara",S.s); paintBar("mike",S.m);
+  const t=Math.max(0,S.t);
+  el("timer").textContent=Math.floor(t/60)+":"+String(Math.floor(t%60)).padStart(2,"0");
+  el("clock").classList.toggle("warn",t<=15);
+  el("arc").style.strokeDashoffset=String(CIRC*(1-t/MATCH));
+  el("specs").textContent=fmt(S.specs);
+  el("phone").classList.toggle("crit", S.s<=30 && S.s>0);
+}
+function setGhost(who,v){ requestAnimationFrame(()=>{ el(who+"Ghost").style.width=Math.max(0,v)+"%"; }); }
+function burst(list){
+  list.forEach((ch,i)=>setTimeout(()=>{
+    const n=document.createElement("div"); n.className="react"; n.textContent=ch;
+    el("reacts").appendChild(n); setTimeout(()=>n.remove(),1100);
+  },i*70));
+}
+function poseSara(kind){
+  const img=el("saraImg"), fig=el("saraFig");
+  img.className=kind==="idle"?"idle-s":"";
+  fig.classList.toggle("atk", kind==="hex"||kind==="bless");
+  img.src={idle:"assets/sara-idle.png",hex:"assets/sara-hex.png",bless:"assets/sara-bless.png",hit:"assets/sara-hit.png"}[kind];
+}
+function poseMike(kind){
+  const img=el("mikeImg"), fig=el("mikeFig");
+  fig.classList.toggle("atk", kind==="hex");
+  img.className=kind==="idle"?"idle-m":"";
+  img.src={idle:"assets/mike-idle.png",hex:"assets/Mike_Hex.png",hit:"assets/Mike_hit.png"}[kind];
+}
+function flash(cls){
+  const n=document.createElement("div"); n.className="flash "+cls; el("fx").appendChild(n);
+  setTimeout(()=>n.remove(),400);
+}
+function rocks(){
+  [0,80,140].forEach((d,i)=>setTimeout(()=>{
+    const r=document.createElement("div"); r.className="rock"+(i?" s":""); el("fx").appendChild(r);
+    setTimeout(()=>r.remove(),520);
+  },d));
+}
+function bolts(){
+  const b=document.createElement("div"); b.className="bolt"; el("fx").appendChild(b);
+  setTimeout(()=>b.remove(),500);
+}
+function hex(){
+  if(!S.run||S.hexBusy||S.hexCd||S.hex<=0) return;
+  S.hexBusy=true; S.hex-=1; vibe(12);
+  el("btnHex").classList.add("press"); el("btnBless").classList.add("dim");
+  el("phone").classList.add("hexing");
+  setTimeout(()=>el("btnHex").classList.remove("press"),240);
+  poseSara("hex"); rocks();
+  setTimeout(()=>{
+    flash("m"); vibe([18,30,24]);
+    el("phone").classList.remove("shake"); void el("phone").offsetWidth; el("phone").classList.add("shake");
+    poseMike("hit");
+    S.m=Math.max(0,S.m-HEX_DMG); paint(); burst(["🔥"]);
+    setTimeout(()=>setGhost("mike",S.m),80);
+    setTimeout(()=>{
+      poseMike("idle"); poseSara("idle");
+      el("btnBless").classList.remove("dim");
+      el("phone").classList.remove("hexing");
+      S.hexBusy=false;
+      if(S.hex<=0) startHexCd();
+      if(S.m<=0) end("VICTORY");
+    },380);
+  },500);
+}
+function startHexCd(){
+  S.hexCd=true; const btn=el("btnHex"), ring=el("hexRing");
+  btn.classList.add("cd"); const t0=performance.now();
+  (function tick(now){
+    const p=Math.min(1,(now-t0)/HEX_CD);
+    ring.style.setProperty("--p",(p*100)+"%");
+    if(p<1 && S.run) requestAnimationFrame(tick);
+    else { S.hex=HEX_MAX; S.hexCd=false; btn.classList.remove("cd"); }
+  })(t0);
+}
+function bless(){
+  if(!S.run||S.blessOn||S.blessCd) return;
+  vibe(16); S.blessOn=true; S.blessCd=true;
+  el("btnBless").classList.add("press"); el("btnHex").classList.add("dim");
+  el("phone").classList.add("warding");
+  setTimeout(()=>el("btnBless").classList.remove("press"),220);
+  poseSara("bless"); burst(["❤️"]);
+  setTimeout(()=>{
+    S.blessOn=false; el("phone").classList.remove("warding");
+    if(S.run) poseSara("idle");
+    el("btnHex").classList.remove("dim");
+    const ring=el("blessRing"), btn=el("btnBless"); btn.classList.add("cd");
+    const t0=performance.now();
+    (function tick(now){
+      const p=Math.min(1,(now-t0)/BLESS_CD);
+      ring.style.setProperty("--p",(p*100)+"%");
+      if(p<1 && S.run) requestAnimationFrame(tick);
+      else { S.blessCd=false; btn.classList.remove("cd"); }
+    })(t0);
+  },BLESS_MS);
+}
+function mikeAtk(){
+  if(!S.run) return;
+  poseMike("hex"); bolts(); el("phone").classList.add("enemy");
+  setTimeout(()=>{
+    if(!S.run) return;
+    if(S.blessOn){
+      flash("w"); vibe(10);
+      S.s=Math.max(0,S.s-Math.round(MIKE_DMG*0.2)); paint(); setTimeout(()=>setGhost("sara",S.s),80);
+    } else {
+      flash("s"); vibe([16,28,20]); poseSara("hit");
+      el("phone").classList.remove("shake"); void el("phone").offsetWidth; el("phone").classList.add("shake");
+      S.s=Math.max(0,S.s-MIKE_DMG); paint(); setTimeout(()=>setGhost("sara",S.s),80);
+      setTimeout(()=>{ if(S.run&&!S.blessOn) poseSara("idle"); },360);
+    }
+    setTimeout(()=>{ if(S.run) poseMike("idle"); el("phone").classList.remove("enemy"); },280);
+    if(S.s<=0) end("DEFEAT");
+  },460);
+}
+function end(title){ S.run=false; el("endTitle").textContent=title; el("end").classList.add("show"); }
+function reset(){
+  Object.assign(S,{run:true,s:100,m:100,hex:HEX_MAX,blessOn:false,hexBusy:false,hexCd:false,blessCd:false,t:MATCH,specs:1543,lastAtk:1.6});
+  el("end").classList.remove("show");
+  el("btnHex").classList.remove("cd","press","dim");
+  el("btnBless").classList.remove("cd","press","dim");
+  el("saraGhost").style.width="100%"; el("mikeGhost").style.width="100%";
+  poseSara("idle"); poseMike("idle"); paint();
+}
+el("btnHex").addEventListener("pointerdown",e=>{ if(e.cancelable) e.preventDefault(); hex(); });
+el("btnBless").addEventListener("pointerdown",e=>{ if(e.cancelable) e.preventDefault(); bless(); });
+el("again").addEventListener("click",reset);
+document.body.classList.toggle("desk", innerWidth>520);
+addEventListener("resize",()=>document.body.classList.toggle("desk", innerWidth>520));
+let last=0;
+function loop(now){
+  if(!last) last=now;
+  const dt=Math.min(.05,(now-last)/1000); last=now;
+  if(S.run){
+    S.t=Math.max(0,S.t-dt);
+    S.lastAtk+=dt;
+    if(S.lastAtk>=3.4){ S.lastAtk=0; mikeAtk(); }
+    if(Math.random()<.003){ S.specs+=1; burst([["🔥","❤️","⚡"][Math.floor(Math.random()*3)]]); }
+    paint();
+    if(S.t<=0) end(S.s>=S.m?"VICTORY":"DEFEAT");
+  }
+  requestAnimationFrame(loop);
+}
+reset(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>
