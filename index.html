@@ -100,23 +100,33 @@
     .flash.w { left:70%; top:66%; background:radial-gradient(circle,#9cf4ff88,#2ad0ff33 45%,transparent 70%); animation:pop .4s ease-out forwards; }
     @keyframes pop { from{transform:scale(.4);opacity:1} to{transform:scale(1.7);opacity:0} }
 
-    .dock { position:absolute; left:0; right:0; bottom:calc(env(safe-area-inset-bottom,0px) + 18px); height:210px; z-index:7; pointer-events:none; }
-    .act { position:absolute; pointer-events:auto; cursor:pointer; touch-action:manipulation; }
-    .act img { width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 10px 16px #000a); transition:transform .14s ease, filter .2s, opacity .2s; }
-    .bless-btn { left:10%; bottom:86px; width:92px; height:92px; }
-    .hex-btn { left:29%; bottom:6px; width:132px; height:132px; }
-    .act:active img { transform:scale(.92); }
-    .hex-btn.press img { transform:scale(1.16); filter:drop-shadow(0 14px 24px #ff7a2088) brightness(1.12); }
-    .bless-btn.press img { transform:scale(1.12); filter:drop-shadow(0 12px 20px #3cf0ff66) brightness(1.08); }
+    .dock { position:absolute; left:0; right:0; bottom:calc(env(safe-area-inset-bottom,0px) + 10px); height:250px; z-index:7; pointer-events:none; }
+    .act {
+      position:absolute; pointer-events:auto; cursor:pointer; touch-action:manipulation;
+      border-radius:50%;
+    }
+    .act img {
+      position:relative; z-index:1;
+      width:100%; height:100%; object-fit:contain;
+      filter:drop-shadow(0 10px 16px #000a);
+      transition:transform .14s ease, filter .2s, opacity .2s;
+    }
+    .bless-btn { left:7%; bottom:108px; width:118px; height:118px; }
+    .hex-btn { left:24%; bottom:2px; width:176px; height:176px; }
+    .act:active img { transform:scale(.94); }
+    .hex-btn.press img { transform:scale(1.12); filter:drop-shadow(0 14px 24px #ff7a2088) brightness(1.12); }
+    .bless-btn.press img { transform:scale(1.1); filter:drop-shadow(0 12px 20px #3cf0ff66) brightness(1.08); }
     .act.dim { opacity:.55; }
     .hex-btn.cd img { filter:grayscale(1) brightness(.72); }
     .hex-btn.cd, .bless-btn.cd { pointer-events:none; }
     .ring {
-      position:absolute; inset:-4px; border-radius:50%; pointer-events:none; opacity:0;
-      background:conic-gradient(#f5a524 var(--p,0%), #ffffff18 0);
-      -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 calc(100% - 5px));
-              mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 calc(100% - 5px));
+      position:absolute; inset:7%; border-radius:50%; pointer-events:none; opacity:0; z-index:2;
+      background:conic-gradient(#f5a524 var(--p,0%), #ffffff22 0);
+      -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 8px),#000 calc(100% - 7px));
+              mask:radial-gradient(farthest-side,transparent calc(100% - 8px),#000 calc(100% - 7px));
     }
+    .hex-btn .ring { inset:8.5%; }
+    .bless-btn .ring { inset:9%; }
     .hex-btn.cd .ring, .bless-btn.cd .ring { opacity:1; }
     .bless-btn .ring { background:conic-gradient(#6ad7ff var(--p,0%), #ffffff18 0); }
 
