@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-  <title>Sara vs Mike v9</title>
+  <title>Sara vs Mike v10</title>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; user-select:none; }
@@ -100,6 +100,22 @@
     .flash.w { left:70%; top:66%; background:radial-gradient(circle,#9cf4ff88,#2ad0ff33 45%,transparent 70%); animation:pop .4s ease-out forwards; }
     @keyframes pop { from{transform:scale(.4);opacity:1} to{transform:scale(1.7);opacity:0} }
 
+    .dmg {
+      position:absolute; z-index:6; pointer-events:none;
+      font-size:22px; font-weight:800; letter-spacing:.04em;
+      color:#f4f7ff; text-shadow:0 2px 10px #000c, 0 0 18px #ff7a2044;
+      animation:dmgUp .9s cubic-bezier(.2,.7,.2,1) forwards;
+      white-space:nowrap;
+    }
+    .dmg.small { font-size:18px; color:#d7e7ff; text-shadow:0 2px 8px #000c, 0 0 14px #6ad7ff55; }
+    .dmg.mike { left:28%; top:26%; }
+    .dmg.sara { left:52%; top:58%; }
+    @keyframes dmgUp {
+      0% { opacity:0; transform:translate(-50%,8px) scale(.86); }
+      18% { opacity:1; transform:translate(-50%,0) scale(1); }
+      100% { opacity:0; transform:translate(-50%,-28px) scale(1); }
+    }
+
     .dock { position:absolute; left:0; right:0; bottom:calc(env(safe-area-inset-bottom,0px) + 10px); height:250px; z-index:7; pointer-events:none; }
     .act {
       position:absolute; pointer-events:auto; cursor:pointer; touch-action:manipulation;
@@ -177,14 +193,14 @@
       </button>
       <button class="act hex-btn" id="btnHex" type="button" aria-label="HEX">
         <span class="ring" id="hexRing"></span>
-        <img src="Hex.svg" alt="">
+        <img src="Hex_1.png" alt="">
       </button>
     </div>
 
     <div class="end" id="end"><div class="card"><h2 id="endTitle">Victory</h2><button id="again" type="button">AGAIN</button></div></div>
   </div>
 <script>
-const HEX_DMG=22, MIKE_DMG=16, HEX_MAX=2, HEX_CD=3000, BLESS_MS=2200, BLESS_CD=2600, MATCH=90;
+const HEX_DMG=20, MIKE_DMG=16, BLESS_REDUCE=2, HEX_MAX=2, HEX_CD=3000, BLESS_MS=2200, BLESS_CD=2600, MATCH=90;
 const S={run:false,s:100,m:100,hex:2,blessOn:false,hexBusy:false,hexCd:false,blessCd:false,t:MATCH,specs:1543,lastAtk:1.8};
 const el=id=>document.getElementById(id);
 const CIRC=2*Math.PI*26;
@@ -241,6 +257,13 @@ function bolts(){
   const b=document.createElement("div"); b.className="bolt"; el("fx").appendChild(b);
   setTimeout(()=>b.remove(),500);
 }
+function floater(who, n){
+  const node=document.createElement("div");
+  node.className="dmg "+who+(n<=4?" small":"");
+  node.textContent="-"+n+" HP";
+  el("fx").appendChild(node);
+  setTimeout(()=>node.remove(),920);
+}
 function hex(){
   if(!S.run||S.hexBusy||S.hexCd||S.hex<=0) return;
   S.hexBusy=true; S.hex-=1; vibe(12);
@@ -252,7 +275,7 @@ function hex(){
     flash("m"); vibe([18,30,24]);
     el("phone").classList.remove("shake"); void el("phone").offsetWidth; el("phone").classList.add("shake");
     poseMike("hit");
-    S.m=Math.max(0,S.m-HEX_DMG); paint(); burst(["🔥"]);
+    S.m=Math.max(0,S.m-HEX_DMG); paint(); floater("mike",HEX_DMG); burst(["🔥"]);
     setTimeout(()=>setGhost("mike",S.m),80);
     setTimeout(()=>{
       poseMike("idle"); poseSara("idle");
@@ -302,11 +325,11 @@ function mikeAtk(){
     if(!S.run) return;
     if(S.blessOn){
       flash("w"); vibe(10);
-      S.s=Math.max(0,S.s-Math.round(MIKE_DMG*0.2)); paint(); setTimeout(()=>setGhost("sara",S.s),80);
+      S.s=Math.max(0,S.s-BLESS_REDUCE); paint(); floater("sara",BLESS_REDUCE); setTimeout(()=>setGhost("sara",S.s),80);
     } else {
       flash("s"); vibe([16,28,20]); poseSara("hit");
       el("phone").classList.remove("shake"); void el("phone").offsetWidth; el("phone").classList.add("shake");
-      S.s=Math.max(0,S.s-MIKE_DMG); paint(); setTimeout(()=>setGhost("sara",S.s),80);
+      S.s=Math.max(0,S.s-MIKE_DMG); paint(); floater("sara",MIKE_DMG); setTimeout(()=>setGhost("sara",S.s),80);
       setTimeout(()=>{ if(S.run&&!S.blessOn) poseSara("idle"); },360);
     }
     setTimeout(()=>{ if(S.run) poseMike("idle"); el("phone").classList.remove("enemy"); },280);
